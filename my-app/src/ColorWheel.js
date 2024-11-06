@@ -5,7 +5,11 @@ function ColorWheel() {
     const canvasRef = useRef(null);
 
     const [dotAngle, setDotAngle] = useState(0);
-    const [isDragging, setIsDragging] = useState(false);
+    const [dotPosition, setDotPosition] = useState({x:500, y:100});
+    const [isDraggingRing, setIsDraggingRing] = useState(false);
+    const [isDraggingSquare, setIsDraggingSquare] = useState(false);
+
+    const squareSize = 200;
 
     useEffect(() => { 
         const canvas = canvasRef.current;
@@ -59,7 +63,32 @@ function ColorWheel() {
         ctx.arc(centerX + radius * Math.cos(dotAngle), centerY + radius * Math.sin(dotAngle), 30, 0, Math.PI * 2);
         ctx.fill();
 
-    }, [dotAngle, hue]);
+
+
+
+
+
+        // draw square
+   
+        const squareX = 3 * width / 4 - squareSize / 2;
+        const squareY = height / 2 - squareSize / 2;
+        ctx.fillStyle = "red";
+        ctx.fillRect(squareX, squareY, squareSize, squareSize);
+
+
+        // draw the dot
+        ctx.fillStyle = "black";
+        ctx.beginPath();
+        ctx.arc(dotPosition.x, dotPosition.y, 33, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.arc(dotPosition.x, dotPosition.y, 30, 0, Math.PI * 2);
+        ctx.fill();
+
+
+    }, [dotAngle, dotPosition]);
 
 
     // function takes xy coordinates of point, determines the angle on colorwheel closest to point. 
@@ -86,35 +115,75 @@ function ColorWheel() {
         const mouseX = event.clientX - rect.left;
         const mouseY = event.clientY - rect.top;
 
+        
+
         if (mouseX < canvas.width / 2) { 
 
-
+            setIsDraggingRing(true);
             setDotAngle(getAngleFromCenter(mouseX, mouseY));
             
-            setIsDragging(true);
+            
+        }
+        else {
+
+            setIsDraggingSquare(true);
+
+            const pad = (canvas.height - squareSize) / 2;
+
+            const leftBound = mouseX > (canvas.width / 2 + pad);
+            const rightBound = mouseX < (canvas.width - pad);
+            const topBound = mouseY < (canvas.height - pad);
+            const bottomBound = mouseY > (pad);
+
+            if (leftBound && rightBound && topBound && bottomBound) { 
+                setDotPosition({x: mouseX, y: mouseY});
+            }
+            else if (leftBound && rightBound) { 
+                setDotPosition(prevPosition => ({x: mouseX, y: prevPosition.y}));
+            }
+            else if (topBound && bottomBound) { 
+                setDotPosition(prevPosition => ({x: prevPosition.x, y: mouseY}));
+            }
         }
     }
 
     function handleMouseMove(event) { 
-        if (!isDragging) return;
+        if (!(isDraggingRing || isDraggingSquare)) return;
 
         const canvas = canvasRef.current;
         const rect = canvas.getBoundingClientRect();
         const mouseX = event.clientX - rect.left;
         const mouseY = event.clientY - rect.top;
 
-        if (mouseX < canvas.width / 2) { 
+        if (isDraggingRing) { 
             setDotAngle(getAngleFromCenter(mouseX, mouseY));
+        }
+        else if (isDraggingSquare) {
+            const pad = (canvas.height - squareSize) / 2;
+
+            const leftBound = mouseX > (canvas.width / 2 + pad);
+            const rightBound = mouseX < (canvas.width - pad);
+            const topBound = mouseY < (canvas.height - pad);
+            const bottomBound = mouseY > (pad);
+
+            if (leftBound && rightBound && topBound && bottomBound) { 
+                setDotPosition({x: mouseX, y: mouseY});
+            }
+            else if (leftBound && rightBound) { 
+                setDotPosition(prevPosition => ({x: mouseX, y: prevPosition.y}));
+            }
+            else if (topBound && bottomBound) { 
+                setDotPosition(prevPosition => ({x: prevPosition.x, y: mouseY}));
+            }
         }
     }
 
     function handleMouseUp() { 
-        setIsDragging(false);
+        setIsDraggingRing(false);
+        setIsDraggingSquare(false);
     }
 
-    function handleMouseLeave() { 
-        setIsDragging(false);
-    }
+
 
 
     return (
@@ -126,7 +195,7 @@ function ColorWheel() {
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseLeave}
+                onMouseLeave={handleMouseUp}
             />
         </>
     )
