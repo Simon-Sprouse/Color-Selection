@@ -3,9 +3,8 @@ import { useRef, useEffect, useState } from 'react'
 function ColorWheel() { 
 
     const canvasRef = useRef(null);
-    const [hue, setHue] = useState(100);
 
-    const [dotPosition, setDotPosition] = useState({x: 0, y: 0});
+    const [dotAngle, setDotAngle] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
 
     useEffect(() => { 
@@ -42,21 +41,43 @@ function ColorWheel() {
         ctx.fill();
 
         // display the current color in the middle of ring
-        ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+        const hueQ = (dotAngle * (180 / Math.PI)) + (90);
+        ctx.fillStyle = `hsl(${hueQ}, 100%, 50%)`;
         ctx.beginPath();
         ctx.arc(centerX, centerY, height / 5, 0, Math.PI * 2);
         ctx.fill();
 
 
         // draw the dot
-        ctx.fillStyle = "white";
+        ctx.fillStyle = "black";
         ctx.beginPath();
-        ctx.arc(dotPosition.x, dotPosition.y, 30, 0, Math.PI * 2);
+        ctx.arc(centerX + radius * Math.cos(dotAngle), centerY + radius * Math.sin(dotAngle), 33, 0, Math.PI * 2);
         ctx.fill();
 
-    }, [dotPosition, hue]);
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.arc(centerX + radius * Math.cos(dotAngle), centerY + radius * Math.sin(dotAngle), 30, 0, Math.PI * 2);
+        ctx.fill();
+
+    }, [dotAngle, hue]);
 
 
+    // function takes xy coordinates of point, determines the angle on colorwheel closest to point. 
+    function getAngleFromCenter(mouseX, mouseY) { 
+        const canvas = canvasRef.current;
+   
+
+        const centerX = canvas.width / 4;
+        const centerY = canvas.height / 2;
+
+        // Calculate angle using atan2
+        const angle = Math.atan2(centerY - mouseY, centerX - mouseX);
+
+        // Normalize to [0, 2π]
+        const normalizedAngle = (angle + Math.PI) % (2 * Math.PI);
+
+        return normalizedAngle;
+    }
 
 
     function handleMouseDown(event) { 
@@ -66,7 +87,10 @@ function ColorWheel() {
         const mouseY = event.clientY - rect.top;
 
         if (mouseX < canvas.width / 2) { 
-            setDotPosition({x: mouseX, y: mouseY});
+
+
+            setDotAngle(getAngleFromCenter(mouseX, mouseY));
+            
             setIsDragging(true);
         }
     }
@@ -80,15 +104,15 @@ function ColorWheel() {
         const mouseY = event.clientY - rect.top;
 
         if (mouseX < canvas.width / 2) { 
-            setDotPosition({x: mouseX, y: mouseY});
+            setDotAngle(getAngleFromCenter(mouseX, mouseY));
         }
     }
 
-    function handleMouseUp(event) { 
+    function handleMouseUp() { 
         setIsDragging(false);
     }
 
-    function handleMouseLeave(event) { 
+    function handleMouseLeave() { 
         setIsDragging(false);
     }
 
