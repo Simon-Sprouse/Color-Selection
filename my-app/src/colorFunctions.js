@@ -71,4 +71,10 @@ function hsvToHex(h, s, v) {
     return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase()}`;
 }
 
-export { hsvToHex, rgbToHsv, hsvToRgb };
+
+function hsvToRgbString(h, s, v) { 
+    const {r, g, b} = hsvToRgb(h, s, v); 
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
+export { hsvToHex, rgbToHsv, hsvToRgb, hsvToRgbString };
