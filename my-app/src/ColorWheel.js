@@ -1,49 +1,45 @@
 import { useRef, useEffect, useState } from 'react'
 import { hsvToHex, hsvToRgb } from './colorFunctions';
 
-function ColorWheel() { 
+function ColorWheel({ updateHsv }) { 
 
     const canvasRef = useRef(null);
 
-    const [dotAngle, setDotAngle] = useState(0);
-    const [dotPosition, setDotPosition] = useState({x:500, y:100});
+    const [dotAngle, setDotAngle] = useState(0.5 * Math.PI);
+    const [dotPosition, setDotPosition] = useState({x:700, y:300});
     const [isDraggingRing, setIsDraggingRing] = useState(false);
     const [isDraggingSquare, setIsDraggingSquare] = useState(false);
 
 
-
+    const border = 2;
     const circlePad = 80;
     const ringWidth = 40;
     const voidWidth = 40;
-
     const squarePad = 50;
     
 
 
 
     useEffect(() => { 
+
+
+        // reset Canvas
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
         const width = canvas.width;
         const height = canvas.height;
-        
-        const border = 2;
-        
+
 
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, width, height);
 
 
 
-        
+        // ------------------------ //
+        // COLOR WHEEL (left third) //
+        // ------------------------ //
 
-        
-
-        // color wheel
-
-
-        
-
+        // display gradient ring on outside
         const ringCenterX = width / 6;
         const ringCenterY = height / 2;
 
@@ -53,7 +49,6 @@ function ColorWheel() {
         for (let i = 0; i < 360; i++) { 
             hueGradient.addColorStop(i / 360, `hsl(${i}, 100%, 50%)`);
         }
-
 
         ctx.fillStyle = "white";
         ctx.beginPath();
@@ -69,7 +64,6 @@ function ColorWheel() {
         // create empty space inside ring
         const voidRadius = circleRadius - ringWidth;
 
-
         ctx.fillStyle = "white";
         ctx.beginPath();
         ctx.arc(ringCenterX, ringCenterY, voidRadius + border, 0, Math.PI * 2);
@@ -82,13 +76,9 @@ function ColorWheel() {
 
 
 
-
-
         // display the current color in the middle of void
         const hue = ((dotAngle * (180 / Math.PI)) + (90)) % 360;
         const hueDisplayRadius = voidRadius - voidWidth;
-
-
 
         ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
         ctx.beginPath();
@@ -112,7 +102,10 @@ function ColorWheel() {
 
 
 
-        // draw square
+        // ------------------------ //
+        // HSV PLANE (middle third) //
+        // ------------------------ //
+
         const squareSize = ((width / 3) - (squarePad * 2));
         
    
@@ -141,11 +134,6 @@ function ColorWheel() {
         // scale the hsv square onto the dimensions we need
         ctx.drawImage(squareCanvas, topCornerX, topCornerY, sideLength, sideLength);
 
-
-
-
-
-
         // draw the dot
         ctx.fillStyle = "black";
         ctx.beginPath();
@@ -162,7 +150,9 @@ function ColorWheel() {
 
 
 
-        // display the final color
+        // ------------------------ //
+        // DISPLAY UI (right third) //
+        // ------------------------ //
 
         
         const squareX = dotPosition.x - (width / 3) - squarePad;
@@ -171,17 +161,17 @@ function ColorWheel() {
         let saturation = ((squareX) / squareSize) * 100;
         let variance = ((squareSize - squareY) / squareSize) * 100;
 
-        if (saturation < 1) {
+        if (saturation < 2) {
             saturation = 0;
         }
-        else if (saturation > 99) {
+        else if (saturation > 98) {
             saturation = 100;
         }
 
-        if (variance < 1) {
+        if (variance < 2) {
             variance = 0;
         }
-        else if (variance > 99) {
+        else if (variance > 98) {
             variance = 100;
         }
 
@@ -189,19 +179,13 @@ function ColorWheel() {
         
 
 
-        
-        
-
         const largeCornerX = 830;
         const largeCornerY = 40;
         const largeCornerSize = 120;
 
-        
-
         const mediumCornerX = 970;
         const mediumCornerY = 40;
         const mediumCornerSize = 80;
-
         
         const smallCornerX = 1069;
         const smallCornerY = 40;
@@ -220,20 +204,11 @@ function ColorWheel() {
         ctx.fillRect(smallCornerX, smallCornerY, smallCornerSize, smallCornerSize);
 
 
-
-        
-
-
-
-
-
+        // diplay text measurements
 
         ctx.font = "700 30px Courier New";
         ctx.fillStyle = "white";
         ctx.textAlign = "center";
-
-
-        console.log("Hue: ", hue);
 
         ctx.fillText("H:", 840, 270)
         ctx.fillText("S:", 840, 300)
@@ -255,7 +230,17 @@ function ColorWheel() {
         const hex = hsvToHex(hue, saturation, variance);
         ctx.fillText("Hex: " + hex, 930, 220)
 
+
+        // update state for parent component
+        const hsv = {h: Math.round(hue), s: Math.round(saturation), v: Math.round(variance)};
+        updateHsv(hsv);
+
+
+
+
     }, [dotAngle, dotPosition]);
+
+
 
 
     // function takes xy coordinates of point, determines the angle on colorwheel closest to point. 
@@ -275,6 +260,8 @@ function ColorWheel() {
         return normalizedAngle;
     }
 
+
+    
 
     function handleMouseDown(event) { 
         const canvas = canvasRef.current;
@@ -353,14 +340,13 @@ function ColorWheel() {
 
     return (
         <>
-            <p>Sand</p>
             <canvas 
                 ref={canvasRef}
                 height="400" width="1200"
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
-                // onMouseLeave={handleMouseUp}
+                onMouseLeave={handleMouseUp}
             />
         </>
     )
