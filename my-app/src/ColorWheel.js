@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
-import { hsvToRgb } from './colorFunctions';
+import { hsvToHex, hsvToRgb } from './colorFunctions';
 
 function ColorWheel() { 
 
@@ -12,11 +12,11 @@ function ColorWheel() {
 
 
 
-    const circlePad = 40;
+    const circlePad = 80;
     const ringWidth = 40;
     const voidWidth = 40;
 
-    const squarePad = 40;
+    const squarePad = 50;
     
 
 
@@ -27,10 +27,10 @@ function ColorWheel() {
         const width = canvas.width;
         const height = canvas.height;
         
-
+        const border = 2;
         
 
-        ctx.fillStyle = "white";
+        ctx.fillStyle = "black";
         ctx.fillRect(0, 0, width, height);
 
 
@@ -40,6 +40,10 @@ function ColorWheel() {
         
 
         // color wheel
+
+
+        
+
         const ringCenterX = width / 6;
         const ringCenterY = height / 2;
 
@@ -50,23 +54,40 @@ function ColorWheel() {
             hueGradient.addColorStop(i / 360, `hsl(${i}, 100%, 50%)`);
         }
 
+
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.arc(ringCenterX, ringCenterY, circleRadius + border, 0, Math.PI * 2);
+        ctx.fill();
+
         ctx.fillStyle = hueGradient;
         ctx.beginPath();
-        ctx.arc(ringCenterX, ringCenterY, circleRadius, 0 * Math.PI, 2 * Math.PI);
+        ctx.arc(ringCenterX, ringCenterY, circleRadius, 0, 2 * Math.PI);
         ctx.fill();
 
 
         // create empty space inside ring
         const voidRadius = circleRadius - ringWidth;
 
+
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.arc(ringCenterX, ringCenterY, voidRadius + border, 0, Math.PI * 2);
+        ctx.fill();
+
         ctx.fillStyle = "black";
         ctx.beginPath();
         ctx.arc(ringCenterX, ringCenterY, voidRadius, 0, Math.PI * 2);
         ctx.fill();
 
+
+
+
+
         // display the current color in the middle of void
         const hue = ((dotAngle * (180 / Math.PI)) + (90)) % 360;
         const hueDisplayRadius = voidRadius - voidWidth;
+
 
 
         ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
@@ -92,6 +113,8 @@ function ColorWheel() {
 
 
         // draw square
+        const squareSize = ((width / 3) - (squarePad * 2));
+        
    
         const squareCanvas = document.createElement('canvas');
         squareCanvas.width = 100;
@@ -112,6 +135,8 @@ function ColorWheel() {
         const topCornerX = (width / 3) + squarePad;
         const topCornerY = squarePad;
         const sideLength = (width / 3) - (2 * squarePad);
+
+        ctx.fillRect(topCornerX - border, topCornerY- border, sideLength + border * 2, sideLength + border * 2);
 
         // scale the hsv square onto the dimensions we need
         ctx.drawImage(squareCanvas, topCornerX, topCornerY, sideLength, sideLength);
@@ -139,30 +164,96 @@ function ColorWheel() {
 
         // display the final color
 
-        const squareSize = ((width / 3) - (squarePad * 2));
-
+        
         const squareX = dotPosition.x - (width / 3) - squarePad;
         const squareY = dotPosition.y - squarePad;
 
-        const saturation = ((squareX) / squareSize) * 100;
-        const variance = ((squareSize - squareY) / squareSize) * 100;
+        let saturation = ((squareX) / squareSize) * 100;
+        let variance = ((squareSize - squareY) / squareSize) * 100;
 
+        if (saturation < 1) {
+            saturation = 0;
+        }
+        else if (saturation > 99) {
+            saturation = 100;
+        }
 
-        const displayCornerX = 900;
-        const displayCornerY = 100;
-        const displayCornerSize = 100;
+        if (variance < 1) {
+            variance = 0;
+        }
+        else if (variance > 99) {
+            variance = 100;
+        }
 
         const {r, g, b} = hsvToRgb(hue, saturation, variance); 
-        ctx.fillStyle = `rgb(${r}, ${g}, ${b})`
-        ctx.fillRect(displayCornerX, displayCornerY, displayCornerSize, displayCornerSize);
+        
 
-        ctx.font = "30px Courier New";
-        ctx.fillStyle = "black";
+
+        
+        
+
+        const largeCornerX = 830;
+        const largeCornerY = 40;
+        const largeCornerSize = 120;
+
+        
+
+        const mediumCornerX = 970;
+        const mediumCornerY = 40;
+        const mediumCornerSize = 80;
+
+        
+        const smallCornerX = 1069;
+        const smallCornerY = 40;
+        const smallCornerSize = 40;
+
+        
+
+        ctx.fillStyle = "white";
+        ctx.fillRect(largeCornerX - border, largeCornerY- border, largeCornerSize + border * 2, largeCornerSize + border * 2);
+        ctx.fillRect(mediumCornerX - border, mediumCornerY- border, mediumCornerSize + border * 2, mediumCornerSize + border * 2);
+        ctx.fillRect(smallCornerX - border, smallCornerY- border, smallCornerSize + border * 2, smallCornerSize + border * 2);
+
+        ctx.fillStyle = `rgb(${r}, ${g}, ${b})`
+        ctx.fillRect(largeCornerX, largeCornerY, largeCornerSize, largeCornerSize);
+        ctx.fillRect(mediumCornerX, mediumCornerY, mediumCornerSize, mediumCornerSize);
+        ctx.fillRect(smallCornerX, smallCornerY, smallCornerSize, smallCornerSize);
+
+
+
+        
+
+
+
+
+
+
+        ctx.font = "700 30px Courier New";
+        ctx.fillStyle = "white";
         ctx.textAlign = "center";
 
-        ctx.fillText("H: " + hue, 1000, 270)
-        ctx.fillText("S: " + saturation, 1000, 300)
-        ctx.fillText("V: " + variance, 1000, 330)
+
+        console.log("Hue: ", hue);
+
+        ctx.fillText("H:", 840, 270)
+        ctx.fillText("S:", 840, 300)
+        ctx.fillText("V:", 840, 330)
+
+        ctx.fillText(Math.floor(hue), 910, 270)
+        ctx.fillText(Math.floor(saturation), 910, 300)
+        ctx.fillText(Math.floor(variance), 910, 330)
+
+
+        ctx.fillText("R:", 1020, 270)
+        ctx.fillText("G:", 1020, 300)
+        ctx.fillText("B:", 1020, 330)
+
+        ctx.fillText(r.toFixed(0), 1090, 270)
+        ctx.fillText(g.toFixed(0), 1090, 300)
+        ctx.fillText(b.toFixed(0), 1090, 330)
+
+        const hex = hsvToHex(hue, saturation, variance);
+        ctx.fillText("Hex: " + hex, 930, 220)
 
     }, [dotAngle, dotPosition]);
 
@@ -269,7 +360,7 @@ function ColorWheel() {
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
+                // onMouseLeave={handleMouseUp}
             />
         </>
     )
