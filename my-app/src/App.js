@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 import './App.css';
 import ColorWheel from './ColorWheel';
 import GradientBar from './GradientBar';
+import DisplayBar from './DisplayBar';
 
 function App() {
 
@@ -49,17 +50,22 @@ function App() {
     return (
         <div className="App">
         <header className="App-header">
-            <p>Küüb</p>
-            {positions.map((pos, index) => (
+            {/* <p>Küüb</p> */}
+            {/* {positions.map((pos, index) => (
                 <p>Position: {pos}  Color: {JSON.stringify(hsvValues[index])}</p>
-            ))}
+            ))} */}
+            <p></p>
+            <DisplayBar hsvValues={hsvValues} positions={positions}/>
+            <p></p>
             <GradientBar hsvValues={hsvValues} setPositions={setPositions}/>
+            <p></p>
             {hsvValues.map((ref, index) => (
                 <ColorWheel key={index} updateHsv={newHsv => updateHsvValue(index, newHsv)}/>
             ))}
+            <p></p>
             <button onClick={addColorWheel}>Add Color</button>
             <button onClick={removeColorWheel}>Remove Color</button>
-
+            <p></p>
 
         </header>
         </div>
