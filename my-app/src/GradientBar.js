@@ -6,11 +6,23 @@ function GradientBar({hsvValues}) {
 
     const canvasRef = useRef(null);
     const barHeight = 50;
+    const width = 1200;
 
-    const [dotPosition, setDotPosition] = useState({x: 300, y:50});
     const [isDragging, setIsDragging] = useState(false);
-
     const [dots, setDots] = useState([]);
+
+    // initialize dots to store one dot for each color wheel
+    useEffect(() => { 
+        const initialDots = [];
+        const numberOfDots = hsvValues.length;
+        for (let i = 0; i < numberOfDots; i++) { 
+            const dotObject = {x: (i / (numberOfDots-1)) * width, y:0, isDragging:false};
+            initialDots.push(dotObject);
+        
+        }
+        setDots(initialDots);
+
+    }, [hsvValues.length]); 
 
 
     useEffect(() => { 
@@ -25,10 +37,14 @@ function GradientBar({hsvValues}) {
         if (hsvValues.length >= 2) { 
 
 
-            const distanceAlongGradient = Math.max(0, dotPosition.x / canvas.width);
-           
-            gradient.addColorStop(distanceAlongGradient, hsvObjectToRgbString(hsvValues[0]));
-            gradient.addColorStop(1, hsvObjectToRgbString(hsvValues[1]));
+
+            for (let i = 0; i < dots.length; i++) { 
+                const distanceAlongGradient = Math.min(Math.max(0, dots[i].x / canvas.width), canvas.width);
+                gradient.addColorStop(distanceAlongGradient, hsvObjectToRgbString(hsvValues[i]));
+            }
+
+
+
         }
         else { 
             gradient.addColorStop(0, "red");
@@ -43,26 +59,38 @@ function GradientBar({hsvValues}) {
 
 
         // draw the dot
-        ctx.fillStyle = "white";
-        ctx.beginPath();
-        ctx.arc(dotPosition.x, dotPosition.y, 33, 0, Math.PI * 2);
-        ctx.fill();
+        for (let i = 0; i < dots.length; i++) { 
 
-        ctx.fillStyle = hsvObjectToRgbString(hsvValues[0]);
-        ctx.beginPath();
-        ctx.arc(dotPosition.x, dotPosition.y, 30, 0, Math.PI * 2);
-        ctx.fill();
+            const dotX = dots[i].x;
+            const dotY = dots[i].y;
+
+            ctx.fillStyle = "black";
+            ctx.beginPath();
+            ctx.arc(dotX, dotY, 33, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = hsvObjectToRgbString(hsvValues[i]);
+            ctx.beginPath();
+            ctx.arc(dotX, dotY, 30, 0, Math.PI * 2);
+            ctx.fill();
+        }
 
 
 
-    }, [hsvValues, dotPosition]);
+
+    }, [hsvValues, dots]);
+
+
+    
 
 
     function hsvObjectToRgbString(hsv) { 
         return hsvToRgbString(hsv.h, hsv.s, hsv.v)
     }
 
-
+    function distance(a, b) { 
+        return Math.sqrt((b.x - a.x)**2 + (b.y - a.y)**2);
+    }
 
 
 
@@ -72,8 +100,46 @@ function GradientBar({hsvValues}) {
         const mouseX = event.clientX - rect.left;
         const mouseY = event.clientY - rect.top;
 
-        setDotPosition({x: mouseX, y:mouseY});
-        setIsDragging(true);
+        const mouseXY = {x: mouseX, y: mouseY};
+
+
+        // find which dot is the closest to the mouse click
+        const threshold = 100;
+        let closestDot = -1; // index of closest dot
+        let closestDistance = 100000;
+        for (let i = 0; i < dots.length; i++) { 
+            const dotX = dots[i].x;
+            const dotY = dots[i].y;
+
+            const dotXY = {x: dotX, y:dotY};
+
+            const clickDistance = distance(dotXY, mouseXY);
+            if (clickDistance < threshold && clickDistance < closestDistance) { 
+                closestDot = i;
+                closestDistance = clickDistance;
+            }
+            
+        }
+
+        // if a dot was clicked update dots state
+        console.log(closestDot);
+        if (closestDot != -1) {
+            setIsDragging(true); // global dragging state
+            setDots(prevDots => { 
+                const newDots = [];
+                for (let i = 0; i < prevDots.length; i++) { 
+                    if (i == closestDot) { 
+                        const clickedDot = {x: mouseX, y: mouseY, isDragging: true};
+                        newDots.push(clickedDot);
+                    }
+                    else { 
+                        newDots.push(prevDots[i]);
+                    }
+                }
+                return newDots;
+            })
+        }
+        
 
     }
 
@@ -85,11 +151,40 @@ function GradientBar({hsvValues}) {
         const mouseX = event.clientX - rect.left;
         const mouseY = event.clientY - rect.top;
 
-        setDotPosition({x: mouseX, y:mouseY});
+
+
+
+        setIsDragging(true); // global dragging state
+        setDots(prevDots => { 
+            const newDots = [];
+            for (let i = 0; i < prevDots.length; i++) { 
+                if (prevDots[i].isDragging == true) { 
+                    const clickedDot = {x: mouseX, y: mouseY, isDragging: true};
+                    newDots.push(clickedDot);
+                }
+                else {
+                    newDots.push(prevDots[i]);
+                }
+            }
+            return newDots;
+        })
+        
+
+        
     }
 
     function handleMouseUp() { 
         setIsDragging(false);
+
+        setDots(prevDots => { 
+            const newDots = [];
+            for (let i = 0; i < prevDots.length; i++) { 
+                const clickedDot = {x: prevDots[i].x, y: prevDots[i].y, isDragging: false};
+                newDots.push(clickedDot);
+            }
+            return newDots;
+        })
+
     }
 
 
