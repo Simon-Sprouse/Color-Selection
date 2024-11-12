@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from 'react'
 
 import { hsvToRgbString } from './colorFunctions';
 
-function GradientBar({hsvValues}) {
+function GradientBar({hsvValues, setPositions}) {
 
     const canvasRef = useRef(null);
     const barHeight = 50;
@@ -33,47 +33,51 @@ function GradientBar({hsvValues}) {
         const gradient = ctx.createLinearGradient(0, barHeight, canvas.width, barHeight);
 
 
+        const newPositions = [];
 
-        if (hsvValues.length >= 2) { 
+        if (hsvValues.length >= 2 && dots.length == hsvValues.length) { 
 
 
-
-            for (let i = 0; i < dots.length; i++) { 
-                const distanceAlongGradient = Math.min(Math.max(0, dots[i].x / canvas.width), canvas.width);
+            for (let i = 0; i < hsvValues.length; i++) { 
+                const distanceAlongGradient = Math.min(Math.max(0, dots[i].x / canvas.width), 1);
+                const roundedDistance = Math.round(distanceAlongGradient * 100) / 100;
+                newPositions.push(roundedDistance);
                 gradient.addColorStop(distanceAlongGradient, hsvObjectToRgbString(hsvValues[i]));
+            }
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, barHeight);
+
+
+
+
+            // draw the dot
+            for (let i = 0; i < dots.length; i++) { 
+
+                const dotX = dots[i].x;
+                const dotY = dots[i].y;
+
+                ctx.fillStyle = "black";
+                ctx.beginPath();
+                ctx.arc(dotX, dotY, 33, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = hsvObjectToRgbString(hsvValues[i]);
+                ctx.beginPath();
+                ctx.arc(dotX, dotY, 30, 0, Math.PI * 2);
+                ctx.fill();
             }
 
 
-
         }
+
         else { 
-            gradient.addColorStop(0, "red");
-            gradient.addColorStop(1, "blue");
-        }
-
-
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, barHeight);
-
-
-
-
-        // draw the dot
-        for (let i = 0; i < dots.length; i++) { 
-
-            const dotX = dots[i].x;
-            const dotY = dots[i].y;
-
             ctx.fillStyle = "black";
-            ctx.beginPath();
-            ctx.arc(dotX, dotY, 33, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = hsvObjectToRgbString(hsvValues[i]);
-            ctx.beginPath();
-            ctx.arc(dotX, dotY, 30, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.fillRect(0, 0, canvas.width, barHeight);
+            newPositions.push(0);
         }
+
+        
+        setPositions(newPositions);
 
 
 
@@ -104,7 +108,7 @@ function GradientBar({hsvValues}) {
 
 
         // find which dot is the closest to the mouse click
-        const threshold = 100;
+        const threshold = 200;
         let closestDot = -1; // index of closest dot
         let closestDistance = 100000;
         for (let i = 0; i < dots.length; i++) { 

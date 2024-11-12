@@ -12,6 +12,8 @@ function App() {
         Array.from({length: 2}, () => ({h: 0, s:0, v:0}))
     );
 
+   
+
     const updateHsvValue = useCallback((index, newHsv) => { 
         setHsvValues(prevValues => 
             prevValues.map((hsv, i) => { 
@@ -24,20 +26,39 @@ function App() {
             })
         )
     }, []);
+
+
+    const [positions, setPositions] = useState(
+        Array.from({length: 2}, () => 0)
+    )
+
+
+
+    function addColorWheel() { 
+        const newValue = {h: 0, s:0, v:0};
+        setHsvValues(prevValues => [...prevValues, newValue]);
+        setPositions(prevPositions => [...prevPositions, 0]);
+    }
+
+    function removeColorWheel() { 
+        setHsvValues(prevValues => prevValues.slice(0, -1));
+        setPositions(prevPositions => prevPositions.slice(0, -1));
+    }   
     
     
     return (
         <div className="App">
         <header className="App-header">
             <p>Küüb</p>
-            {/* {hsvValues.map((hsv, index) => (
-                <p>{JSON.stringify(hsv)}</p>
-            ))} */}
-            <GradientBar hsvValues={hsvValues}/>
-            <p></p>
+            {positions.map((pos, index) => (
+                <p>Position: {pos}  Color: {JSON.stringify(hsvValues[index])}</p>
+            ))}
+            <GradientBar hsvValues={hsvValues} setPositions={setPositions}/>
             {hsvValues.map((ref, index) => (
                 <ColorWheel key={index} updateHsv={newHsv => updateHsvValue(index, newHsv)}/>
             ))}
+            <button onClick={addColorWheel}>Add Color</button>
+            <button onClick={removeColorWheel}>Remove Color</button>
 
 
         </header>
