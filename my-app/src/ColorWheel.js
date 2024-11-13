@@ -1,22 +1,59 @@
 import { useRef, useEffect, useState } from 'react'
 import { hsvToHex, hsvToRgb } from './colorFunctions';
 
-function ColorWheel({ updateHsv }) { 
+function ColorWheel({ hsv, updateHsv }) { 
 
-    const canvasRef = useRef(null);
 
-    const [dotAngle, setDotAngle] = useState(0.5 * Math.PI);
-    const [dotPosition, setDotPosition] = useState({x:700, y:300});
-    const [isDraggingRing, setIsDraggingRing] = useState(false);
-    const [isDraggingSquare, setIsDraggingSquare] = useState(false);
-
+    const width = 1200
 
     const border = 2;
     const circlePad = 80;
     const ringWidth = 40;
     const voidWidth = 40;
     const squarePad = 50;
+    const squareSize = ((width / 3) - (squarePad * 2));
+
+
+    const initialDotX = (2 * width / 3) - squarePad;
+    const initialDotY = squarePad;
+
+    const canvasRef = useRef(null);
+
+    const [dotAngle, setDotAngle] = useState(0.5 * Math.PI);
+    const [dotPosition, setDotPosition] = useState({x:initialDotX, y:initialDotY});
+    const [isDraggingRing, setIsDraggingRing] = useState(false);
+    const [isDraggingSquare, setIsDraggingSquare] = useState(false);
+
+
+    const [initialSetup, setInitialSetup] = useState(true);
+
+
     
+
+    // const initialHsv = {h: 90, s: 100, v: 100}
+    
+
+    // // set initial conditions
+    // useEffect(() => { 
+    //     if (initialSetup) {
+    //         setControlsByHSV(initialHsv);
+
+    //     }
+    // }, []);
+
+    // set controls to match hsv change (from parent) THIS BREAKS THE DRAG FUNCTION
+    useEffect(() => { 
+
+
+
+        if (!isDraggingRing && !isDraggingSquare) { 
+            setControlsByHSV(hsv);
+        }
+        
+
+        
+    }, [hsv])
+
 
 
 
@@ -106,7 +143,7 @@ function ColorWheel({ updateHsv }) {
         // HSV PLANE (middle third) //
         // ------------------------ //
 
-        const squareSize = ((width / 3) - (squarePad * 2));
+        
         
    
         const squareCanvas = document.createElement('canvas');
@@ -146,15 +183,6 @@ function ColorWheel({ updateHsv }) {
         ctx.fill();
 
 
-
-
-
-
-        // ------------------------ //
-        // DISPLAY UI (right third) //
-        // ------------------------ //
-
-        
         const squareX = dotPosition.x - (width / 3) - squarePad;
         const squareY = dotPosition.y - squarePad;
 
@@ -174,6 +202,15 @@ function ColorWheel({ updateHsv }) {
         else if (variance > 98) {
             variance = 100;
         }
+
+
+
+        // ------------------------ //
+        // DISPLAY UI (right third) //
+        // ------------------------ //
+
+        
+       
 
         const {r, g, b} = hsvToRgb(hue, saturation, variance); 
         
@@ -241,6 +278,32 @@ function ColorWheel({ updateHsv }) {
     }, [dotAngle, dotPosition]);
 
 
+    // takes hsv input and makes controls match that input
+    function setControlsByHSV(hsv) { 
+        // dot angle
+        const newAngle = hsv.h * (Math.PI / 180) - (0.5 * Math.PI);
+        setDotAngle(newAngle);
+
+        // dot position
+
+        const cornerX = (width / 3) + squarePad;
+        const cornerY = squarePad;
+
+    
+
+        const squareX = (hsv.s / 100) * squareSize;
+        const squareY = ((100 - hsv.v) / 100) * squareSize;
+
+        const newDotPosition = {
+            x: cornerX + squareX,
+            y: cornerY + squareY
+        };
+        setDotPosition(newDotPosition);
+
+
+        setInitialSetup(false);
+
+    }
 
 
     // function takes xy coordinates of point, determines the angle on colorwheel closest to point. 
