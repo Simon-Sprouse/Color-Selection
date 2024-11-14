@@ -41,7 +41,7 @@ function DisplayBar({hsvValues, positions}) {
 
         // console.log("Discrete Bar");
 
-        if (style == 0) {
+        if (style == 1) {
             if (hsvValues.length >= 2 && hsvValues.length == positions.length) { 
 
                 // const numPanels = 5;

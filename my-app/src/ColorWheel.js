@@ -1,9 +1,10 @@
 import { useRef, useEffect, useState } from 'react'
 import { hsvToHex, hsvToRgb } from './colorFunctions';
 
-function ColorWheel({ hsv, updateHsv }) { 
+function ColorWheel({ hsv, counter, updateHsv }) { 
 
 
+    const height = 400
     const width = 1200
 
     const border = 2;
@@ -25,23 +26,15 @@ function ColorWheel({ hsv, updateHsv }) {
     const [isDraggingSquare, setIsDraggingSquare] = useState(false);
 
 
-    const [initialSetup, setInitialSetup] = useState(true);
+
+    const hsvText = useRef(hsv);
 
 
     
 
-    // const initialHsv = {h: 90, s: 100, v: 100}
-    
 
-    // // set initial conditions
-    // useEffect(() => { 
-    //     if (initialSetup) {
-    //         setControlsByHSV(initialHsv);
 
-    //     }
-    // }, []);
-
-    // set controls to match hsv change (from parent) THIS BREAKS THE DRAG FUNCTION
+    // // set controls to match hsv change (from parent) THIS BREAKS THE DRAG FUNCTION
     useEffect(() => { 
 
 
@@ -52,7 +45,7 @@ function ColorWheel({ hsv, updateHsv }) {
         
 
         
-    }, [hsv])
+    }, [counter])
 
 
 
@@ -67,7 +60,7 @@ function ColorWheel({ hsv, updateHsv }) {
         const height = canvas.height;
 
 
-        ctx.fillStyle = "black";
+        ctx.fillStyle = "tan";
         ctx.fillRect(0, 0, width, height);
 
 
@@ -186,6 +179,8 @@ function ColorWheel({ hsv, updateHsv }) {
         const squareX = dotPosition.x - (width / 3) - squarePad;
         const squareY = dotPosition.y - squarePad;
 
+        
+
         let saturation = ((squareX) / squareSize) * 100;
         let variance = ((squareSize - squareY) / squareSize) * 100;
 
@@ -264,13 +259,17 @@ function ColorWheel({ hsv, updateHsv }) {
         ctx.fillText(g.toFixed(0), 1090, 300)
         ctx.fillText(b.toFixed(0), 1090, 330)
 
+        ctx.fillText(counter, 1090, 370)
+
         const hex = hsvToHex(hue, saturation, variance);
         ctx.fillText("Hex: " + hex, 930, 220)
 
 
         // update state for parent component
-        const hsv = {h: Math.round(hue), s: Math.round(saturation), v: Math.round(variance)};
-        updateHsv(hsv);
+        const colorWheelHSV = {h: Math.floor(hue), s: Math.floor(saturation), v: Math.floor(variance)};
+        updateHsv(colorWheelHSV);
+
+
 
 
 
@@ -301,7 +300,6 @@ function ColorWheel({ hsv, updateHsv }) {
         setDotPosition(newDotPosition);
 
 
-        setInitialSetup(false);
 
     }
 
@@ -405,12 +403,13 @@ function ColorWheel({ hsv, updateHsv }) {
         <>
             <canvas 
                 ref={canvasRef}
-                height="400" width="1200"
+                height={height} width={width}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
             />
+            <div></div>
         </>
     )
 }

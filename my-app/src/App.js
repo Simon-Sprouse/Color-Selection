@@ -13,6 +13,8 @@ function App() {
         Array.from({length: 2}, () => (defaultHsv))
     );
 
+    const [counter, setCounter] = useState(0);
+
    
 
     const updateHsvValue = useCallback((index, newHsv) => { 
@@ -48,6 +50,7 @@ function App() {
 
 
     function randomizeColors() { 
+        setCounter(prev => prev + 1);
         const randomHSV = hsvValues.map(() => ({ 
             h: Math.floor(Math.random() * 360),
             s: Math.floor(Math.random() * 101),
@@ -75,6 +78,7 @@ function App() {
                 <ColorWheel 
                     key={index} 
                     hsv={hsv}
+                    counter={counter}
                     updateHsv={newHsv => updateHsvValue(index, newHsv)}/>
             ))}
             <p></p>
