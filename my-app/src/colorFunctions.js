@@ -77,4 +77,8 @@ function hsvToRgbString(h, s, v) {
     return `rgb(${r}, ${g}, ${b})`;
 }
 
-export { hsvToHex, rgbToHsv, hsvToRgb, hsvToRgbString };
+function hsvObjectToRgbString(hsv) { 
+    return hsvToRgbString(hsv.h, hsv.s, hsv.v)
+}
+
+export { hsvToHex, rgbToHsv, hsvToRgb, hsvToRgbString, hsvObjectToRgbString };

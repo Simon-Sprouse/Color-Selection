@@ -4,23 +4,44 @@ import { hsvToHex, hsvToRgb } from './colorFunctions';
 function ColorWheel({ hsv, counter, updateHsv }) { 
 
 
-    const height = 400
-    const width = 1200
+    const height = 400;
+    const width = height * 3;
 
-    const border = 2;
+
     const circlePad = 80;
     const ringWidth = 40;
     const voidWidth = 40;
     const squarePad = 50;
     const squareSize = ((width / 3) - (squarePad * 2));
 
+    const leftDisplayMargin = 30;
+    const displaySquareMargin = 20;
+    const largeDisplaySize = 120;
 
+    const fontSize = 30;
+
+    const distanceAferColon = 70;
+    const distanceBetweenHSVRGB = 130;
+    const verticalSectionSpacing = 60;
+
+
+
+    const backgroundColor = "ivory";
+    const textColor = "black";
+    const borderColor = "black";
+    const border = 3;
+    const fontWeight = 600;
+
+
+    
+
+    const initialDotAngle = 0.5 * Math.PI;
     const initialDotX = (2 * width / 3) - squarePad;
     const initialDotY = squarePad;
 
     const canvasRef = useRef(null);
 
-    const [dotAngle, setDotAngle] = useState(0.5 * Math.PI);
+    const [dotAngle, setDotAngle] = useState(initialDotAngle);
     const [dotPosition, setDotPosition] = useState({x:initialDotX, y:initialDotY});
     const [isDraggingRing, setIsDraggingRing] = useState(false);
     const [isDraggingSquare, setIsDraggingSquare] = useState(false);
@@ -60,7 +81,7 @@ function ColorWheel({ hsv, counter, updateHsv }) {
         const height = canvas.height;
 
 
-        ctx.fillStyle = "tan";
+        ctx.fillStyle = backgroundColor;
         ctx.fillRect(0, 0, width, height);
 
 
@@ -80,7 +101,7 @@ function ColorWheel({ hsv, counter, updateHsv }) {
             hueGradient.addColorStop(i / 360, `hsl(${i}, 100%, 50%)`);
         }
 
-        ctx.fillStyle = "white";
+        ctx.fillStyle = borderColor;
         ctx.beginPath();
         ctx.arc(ringCenterX, ringCenterY, circleRadius + border, 0, Math.PI * 2);
         ctx.fill();
@@ -94,7 +115,7 @@ function ColorWheel({ hsv, counter, updateHsv }) {
         // create empty space inside ring
         const voidRadius = circleRadius - ringWidth;
 
-        ctx.fillStyle = "white";
+        ctx.fillStyle = borderColor;
         ctx.beginPath();
         ctx.arc(ringCenterX, ringCenterY, voidRadius + border, 0, Math.PI * 2);
         ctx.fill();
@@ -159,6 +180,7 @@ function ColorWheel({ hsv, counter, updateHsv }) {
         const topCornerY = squarePad;
         const sideLength = (width / 3) - (2 * squarePad);
 
+        ctx.fillStyle = borderColor;
         ctx.fillRect(topCornerX - border, topCornerY- border, sideLength + border * 2, sideLength + border * 2);
 
         // scale the hsv square onto the dimensions we need
@@ -204,28 +226,28 @@ function ColorWheel({ hsv, counter, updateHsv }) {
         // DISPLAY UI (right third) //
         // ------------------------ //
 
-        
+        const leftWall = (2 * canvas.width / 3) + leftDisplayMargin;
        
 
         const {r, g, b} = hsvToRgb(hue, saturation, variance); 
         
 
 
-        const largeCornerX = 830;
-        const largeCornerY = 40;
-        const largeCornerSize = 120;
+        const largeCornerX = leftWall;
+        const largeCornerY = squarePad;
+        const largeCornerSize = largeDisplaySize;
 
-        const mediumCornerX = 970;
-        const mediumCornerY = 40;
-        const mediumCornerSize = 80;
+        const mediumCornerX = largeCornerX + largeCornerSize + displaySquareMargin;
+        const mediumCornerY = squarePad;
+        const mediumCornerSize = largeCornerSize * (2/3);
         
-        const smallCornerX = 1069;
-        const smallCornerY = 40;
-        const smallCornerSize = 40;
+        const smallCornerX = mediumCornerX + mediumCornerSize + displaySquareMargin;
+        const smallCornerY = squarePad;
+        const smallCornerSize = largeCornerSize * (1/3);
 
         
 
-        ctx.fillStyle = "white";
+        ctx.fillStyle = borderColor;
         ctx.fillRect(largeCornerX - border, largeCornerY- border, largeCornerSize + border * 2, largeCornerSize + border * 2);
         ctx.fillRect(mediumCornerX - border, mediumCornerY- border, mediumCornerSize + border * 2, mediumCornerSize + border * 2);
         ctx.fillRect(smallCornerX - border, smallCornerY- border, smallCornerSize + border * 2, smallCornerSize + border * 2);
@@ -238,31 +260,44 @@ function ColorWheel({ hsv, counter, updateHsv }) {
 
         // diplay text measurements
 
-        ctx.font = "700 30px Courier New";
-        ctx.fillStyle = "white";
-        ctx.textAlign = "center";
-
-        ctx.fillText("H:", 840, 270)
-        ctx.fillText("S:", 840, 300)
-        ctx.fillText("V:", 840, 330)
-
-        ctx.fillText(Math.floor(hue), 910, 270)
-        ctx.fillText(Math.floor(saturation), 910, 300)
-        ctx.fillText(Math.floor(variance), 910, 330)
 
 
-        ctx.fillText("R:", 1020, 270)
-        ctx.fillText("G:", 1020, 300)
-        ctx.fillText("B:", 1020, 330)
 
-        ctx.fillText(r.toFixed(0), 1090, 270)
-        ctx.fillText(g.toFixed(0), 1090, 300)
-        ctx.fillText(b.toFixed(0), 1090, 330)
+        ctx.font = `${fontWeight} ${fontSize}px Courier New`;
+        ctx.fillStyle = textColor;
+        ctx.textAlign = "left";
 
-        ctx.fillText(counter, 1090, 370)
 
+        const hexSectionVeritcal = largeCornerY + verticalSectionSpacing  + largeCornerSize;
         const hex = hsvToHex(hue, saturation, variance);
-        ctx.fillText("Hex: " + hex, 930, 220)
+        ctx.fillText("Hex: " + hex, leftWall, hexSectionVeritcal);
+        // ctx.fillText(counter, rightValue, 370);
+
+        const leftLabel = leftWall;
+        const leftValue = leftWall + distanceAferColon;
+        const hsvSectionVertical = hexSectionVeritcal + (0 * fontSize) + verticalSectionSpacing;
+        ctx.fillText("H:", leftLabel, hsvSectionVertical);
+        ctx.fillText("S:", leftLabel, hsvSectionVertical + fontSize);
+        ctx.fillText("V:", leftLabel, hsvSectionVertical + 2 * fontSize);
+
+        ctx.fillText(Math.floor(hue), leftValue, hsvSectionVertical);
+        ctx.fillText(Math.floor(saturation), leftValue, hsvSectionVertical + fontSize);
+        ctx.fillText(Math.floor(variance), leftValue, hsvSectionVertical + 2 * fontSize);
+
+        const rightLabel = leftValue + distanceBetweenHSVRGB;
+        const rightValue = rightLabel + distanceAferColon;
+
+        ctx.fillText("R:", rightLabel, hsvSectionVertical);
+        ctx.fillText("G:", rightLabel, hsvSectionVertical + fontSize);
+        ctx.fillText("B:", rightLabel, hsvSectionVertical + 2 * fontSize);
+
+        ctx.fillText(r.toFixed(0), rightValue, hsvSectionVertical);
+        ctx.fillText(g.toFixed(0), rightValue, hsvSectionVertical + fontSize);
+        ctx.fillText(b.toFixed(0), rightValue, hsvSectionVertical + 2 * fontSize);
+
+
+
+        
 
 
         // update state for parent component
@@ -401,6 +436,7 @@ function ColorWheel({ hsv, counter, updateHsv }) {
 
     return (
         <>
+
             <canvas 
                 ref={canvasRef}
                 height={height} width={width}
@@ -409,7 +445,8 @@ function ColorWheel({ hsv, counter, updateHsv }) {
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
             />
-            <div></div>
+
+       
         </>
     )
 }

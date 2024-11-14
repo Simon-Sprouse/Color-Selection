@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 
-import { hsvToRgbString } from './colorFunctions';
+import { hsvObjectToRgbString } from './colorFunctions';
 
 function DisplayBar({hsvValues, positions}) { 
 
@@ -82,10 +82,6 @@ function DisplayBar({hsvValues, positions}) {
 
 
     }, [hsvValues, positions, numPanels, style]);
-
-    function hsvObjectToRgbString(hsv) { 
-        return hsvToRgbString(hsv.h, hsv.s, hsv.v)
-    }
 
 
     function getPixelColor(distance) { 

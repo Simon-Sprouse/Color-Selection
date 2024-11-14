@@ -5,6 +5,8 @@ import ColorWheel from './ColorWheel';
 import GradientBar from './GradientBar';
 import DisplayBar from './DisplayBar';
 
+import { hsvObjectToRgbString } from './colorFunctions';
+
 function App() {
 
     const defaultHsv = {h: 180, s:100, v:100};
@@ -64,9 +66,13 @@ function App() {
         <div className="App">
         <header className="App-header">
             {/* <p>Küüb</p> */}
-            {/* {positions.map((pos, index) => (
-                <p>Position: {pos}  Color: {JSON.stringify(hsvValues[index])}</p>
-            ))} */}
+            <pre style={{textAlign: "left"}}>
+                {"background: linear-gradient(90deg,\n"}
+                {positions.map((pos, index) => (
+                    `\t${hsvObjectToRgbString(hsvValues[index])} ${Math.round(pos*100)}%${index != (positions.length-1) ? "," : ""}\n`
+                ))}
+                {");\n"}
+            </pre>
             <p></p>
             <button onClick={randomizeColors}>Randomize Colors</button>
             <p></p>

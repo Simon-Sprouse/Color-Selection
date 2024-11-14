@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react'
 
-import { hsvToRgbString } from './colorFunctions';
+import { hsvObjectToRgbString } from './colorFunctions';
 
 function GradientBar({hsvValues, setPositions}) {
 
@@ -88,9 +88,7 @@ function GradientBar({hsvValues, setPositions}) {
     
 
 
-    function hsvObjectToRgbString(hsv) { 
-        return hsvToRgbString(hsv.h, hsv.s, hsv.v)
-    }
+    
 
     function distance(a, b) { 
         return Math.sqrt((b.x - a.x)**2 + (b.y - a.y)**2);
