@@ -17,6 +17,9 @@ function App() {
 
     const [counter, setCounter] = useState(0);
 
+    const [style, setStyle] = useState(0);
+    const [numPanels, setNumPanels] = useState(5);
+
    
 
     const updateHsvValue = useCallback((index, newHsv) => { 
@@ -66,17 +69,15 @@ function App() {
         <div className="App">
         <header className="App-header">
             {/* <p>Küüb</p> */}
-            <pre style={{textAlign: "left"}}>
-                {"background: linear-gradient(90deg,\n"}
-                {positions.map((pos, index) => (
-                    `\t${hsvObjectToRgbString(hsvValues[index])} ${Math.round(pos*100)}%${index != (positions.length-1) ? "," : ""}\n`
-                ))}
-                {");\n"}
-            </pre>
+            
             <p></p>
-            <button onClick={randomizeColors}>Randomize Colors</button>
-            <p></p>
-            <DisplayBar hsvValues={hsvValues} positions={positions}/>
+            <span>
+                <button onClick={randomizeColors}>Randomize Colors</button>
+                <button onClick={() => setStyle(prevStyle => prevStyle == 1 ? 0 : 1)}>Style</button>
+                <input className="rangeBar" type="range" min="1" max="20" value={numPanels} onChange={(e) => setNumPanels(e.target.value)}/>
+            </span>
+
+            <DisplayBar hsvValues={hsvValues} positions={positions} style={style} numPanels={numPanels}/>
             <p></p>
             <GradientBar hsvValues={hsvValues} setPositions={setPositions}/>
             <p></p>
@@ -88,9 +89,19 @@ function App() {
                     updateHsv={newHsv => updateHsvValue(index, newHsv)}/>
             ))}
             <p></p>
-            <button onClick={addColorWheel}>Add Color</button>
-            <button onClick={removeColorWheel}>Remove Color</button>
+            <span>
+                <button onClick={addColorWheel}>Add Color</button>
+                <button onClick={removeColorWheel}>Remove Color</button>
+            </span>
+            
             <p></p>
+            <pre style={{textAlign: "left"}}>
+                {"background: linear-gradient(90deg,\n"}
+                {positions.map((pos, index) => (
+                    `\t${hsvObjectToRgbString(hsvValues[index])} ${Math.round(pos*100)}%${index != (positions.length-1) ? "," : ""}\n`
+                ))}
+                {");\n"}
+            </pre>
 
         </header>
         </div>

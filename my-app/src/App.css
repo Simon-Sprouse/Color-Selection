@@ -9,11 +9,7 @@
 
   /* background-color: wheat; */
 
-  background: linear-gradient(90deg,
-  rgb(12, 18, 18) 0%,
-  rgb(80, 89, 49) 46%,
-  rgb(127, 186, 176) 100%
-);
+    background-color: wheat;
 
 
 
@@ -23,10 +19,18 @@
     align-items: center;
     justify-content: center;
     font-size: calc(10px + 2vmin);
-    color: white;
+    color: black;
 }
 
+button { 
+    padding: 20px;
+    font-size: 30px;
+    margin: 20px;
+}
 
+.rangeBar {
+    width: 400px;
+}
 
 /* canvas { 
     border: 1px solid black;

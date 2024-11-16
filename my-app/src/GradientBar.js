@@ -54,16 +54,15 @@ function GradientBar({hsvValues, setPositions}) {
             for (let i = 0; i < dots.length; i++) { 
 
                 const dotX = dots[i].x;
-                const dotY = dots[i].y;
 
                 ctx.fillStyle = "black";
                 ctx.beginPath();
-                ctx.arc(dotX, dotY, 33, 0, Math.PI * 2);
+                ctx.arc(dotX, barHeight, 33, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.fillStyle = hsvObjectToRgbString(hsvValues[i]);
                 ctx.beginPath();
-                ctx.arc(dotX, dotY, 30, 0, Math.PI * 2);
+                ctx.arc(dotX, barHeight, 30, 0, Math.PI * 2);
                 ctx.fill();
             }
 
