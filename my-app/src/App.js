@@ -63,6 +63,35 @@ function App() {
         }));
         setHsvValues(randomHSV);
     }
+
+    function boundedRandomNumber(lower, upper) { 
+        const diff = upper - lower;
+        return Math.floor((Math.random() * diff) + lower);
+    }
+
+    function psuedoRandomizeColors() { 
+        setCounter(prev => prev + 1);
+        let prevS = 0;
+        let prevV = 0;
+
+        const psuedoRandomHSV = hsvValues.map(() => {
+
+
+            const newS = boundedRandomNumber(prevS, 101);
+            const newV = boundedRandomNumber(prevV, 101);
+
+            prevS = newS;
+            prevV = newV;
+
+            return {
+            h: boundedRandomNumber(0, 360),
+            s: newS,
+            v: newV
+            }
+        })
+
+        setHsvValues(psuedoRandomHSV);
+    }
     
     
     return (
@@ -72,9 +101,11 @@ function App() {
             
             <p></p>
             <span>
-                <button onClick={randomizeColors}>Randomize Colors</button>
-                <button onClick={() => setStyle(prevStyle => prevStyle == 1 ? 0 : 1)}>Style</button>
-                <input className="rangeBar" type="range" min="1" max="20" value={numPanels} onChange={(e) => setNumPanels(e.target.value)}/>
+                <button onClick={psuedoRandomizeColors}>Randomize Colors</button>
+                <button onClick={() => setStyle(prevStyle => prevStyle == 1 ? 0 : 1)}>{style == 1 ? "Gradient" : "Step"}</button>
+                {style == 1 && (
+                    <input className="rangeBar" type="range" min="1" max="20" value={numPanels} onChange={(e) => setNumPanels(e.target.value)}/>
+                )}
             </span>
 
             <DisplayBar hsvValues={hsvValues} positions={positions} style={style} numPanels={numPanels}/>
@@ -95,13 +126,13 @@ function App() {
             </span>
             
             <p></p>
-            <pre style={{textAlign: "left"}}>
+            {/* <pre style={{textAlign: "left"}}>
                 {"background: linear-gradient(90deg,\n"}
                 {positions.map((pos, index) => (
                     `\t${hsvObjectToRgbString(hsvValues[index])} ${Math.round(pos*100)}%${index != (positions.length-1) ? "," : ""}\n`
                 ))}
                 {");\n"}
-            </pre>
+            </pre> */}
 
         </header>
         </div>

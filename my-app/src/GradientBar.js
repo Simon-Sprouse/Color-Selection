@@ -205,7 +205,7 @@ function GradientBar({hsvValues, setPositions}) {
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
+                // onMouseLeave={handleMouseUp}
             ></canvas>
         </>
     )

@@ -443,7 +443,7 @@ function ColorWheel({ hsv, counter, updateHsv }) {
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
+                // onMouseLeave={handleMouseUp}
             />
 
        
