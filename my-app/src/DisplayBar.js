@@ -2,13 +2,14 @@ import { useRef, useEffect, useState } from 'react';
 
 import { hsvObjectToRgbString } from './colorFunctions';
 
-function DisplayBar({hsvValues, positions, style, numPanels}) { 
+function DisplayBar({width, hsvValues, positions, style, numPanels}) { 
+
+    // const width = 800;
+    const height = width / 4;
 
 
     const canvasRef = useRef(null);
-    // const [numPanels, setNumPanels] = useState(2);
 
-    // const [style, setStyle] = useState(0); // 0 continuous, 1 discrete
 
 
 
@@ -110,15 +111,7 @@ function DisplayBar({hsvValues, positions, style, numPanels}) {
 
     return (
         <>
-            {/* {positions.map((pos, index) => (
-                <p key={index}>Position: {pos}  Color: {JSON.stringify(hsvValues[index])}</p>
-            ))}
-            <p>Purple hair, purple hair, I'm a fuzzy fertile bear</p> */}
-        
-            {/* <button onClick={() => setStyle(prevStyle => prevStyle == 1 ? 0 : 1)}>Style</button>
-            <input type="range" min="1" max="20" value={numPanels} onChange={(e) => setNumPanels(e.target.value)}/> */}
-            <p></p>
-            <canvas width="1200" height="200" ref={canvasRef}></canvas>
+            <canvas width={width} height={height} ref={canvasRef}></canvas>
         </>
     )
 }

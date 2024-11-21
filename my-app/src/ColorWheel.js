@@ -1,28 +1,31 @@
 import { useRef, useEffect, useState } from 'react'
 import { hsvToHex, hsvToRgb } from './colorFunctions';
 
-function ColorWheel({ hsv, counter, updateHsv }) { 
+function ColorWheel({ width, hsv, counter, updateHsv }) { 
 
 
-    const height = 400;
-    const width = height * 3;
+
+    // const width = 800;
+    const height = width / 3
 
 
-    const circlePad = 80;
-    const ringWidth = 40;
-    const voidWidth = 40;
-    const squarePad = 50;
+    const circlePad = height / 5;
+    const ringWidth = height / 10;
+    const voidWidth = height / 10;
+    const squarePad = height / 9;
     const squareSize = ((width / 3) - (squarePad * 2));
 
-    const leftDisplayMargin = 30;
-    const displaySquareMargin = 20;
-    const largeDisplaySize = 120;
+    const leftDisplayMargin = height / 13;
+    const displaySquareMargin = height / 20;
+    const largeDisplaySize = height * 0.3;
 
-    const fontSize = 30;
+    const fontSize = Math.floor(height / 12);
 
-    const distanceAferColon = 70;
-    const distanceBetweenHSVRGB = 130;
-    const verticalSectionSpacing = 60;
+    const distanceAferColon = fontSize * 2;
+    const distanceBetweenHSVRGB = fontSize * 4;
+    const verticalSectionSpacing = fontSize * 2;
+
+    const dotSize = fontSize;
 
 
 
@@ -140,12 +143,12 @@ function ColorWheel({ hsv, counter, updateHsv }) {
         // draw the dot
         ctx.fillStyle = "black";
         ctx.beginPath();
-        ctx.arc(ringCenterX + circleRadius * Math.cos(dotAngle), ringCenterY + circleRadius * Math.sin(dotAngle), 33, 0, Math.PI * 2);
+        ctx.arc(ringCenterX + circleRadius * Math.cos(dotAngle), ringCenterY + circleRadius * Math.sin(dotAngle), dotSize + border, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.fillStyle = "white";
         ctx.beginPath();
-        ctx.arc(ringCenterX + circleRadius * Math.cos(dotAngle), ringCenterY + circleRadius * Math.sin(dotAngle), 30, 0, Math.PI * 2);
+        ctx.arc(ringCenterX + circleRadius * Math.cos(dotAngle), ringCenterY + circleRadius * Math.sin(dotAngle), dotSize, 0, Math.PI * 2);
         ctx.fill();
 
 
@@ -189,12 +192,12 @@ function ColorWheel({ hsv, counter, updateHsv }) {
         // draw the dot
         ctx.fillStyle = "black";
         ctx.beginPath();
-        ctx.arc(dotPosition.x, dotPosition.y, 33, 0, Math.PI * 2);
+        ctx.arc(dotPosition.x, dotPosition.y, dotSize + border, 0, Math.PI * 2);
         ctx.fill();
 
         ctx.fillStyle = "white";
         ctx.beginPath();
-        ctx.arc(dotPosition.x, dotPosition.y, 30, 0, Math.PI * 2);
+        ctx.arc(dotPosition.x, dotPosition.y, dotSize, 0, Math.PI * 2);
         ctx.fill();
 
 

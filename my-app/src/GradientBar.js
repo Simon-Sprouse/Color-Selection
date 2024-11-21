@@ -2,11 +2,14 @@ import { useRef, useEffect, useState } from 'react'
 
 import { hsvObjectToRgbString } from './colorFunctions';
 
-function GradientBar({hsvValues, setPositions}) {
+function GradientBar({width, hsvValues, setPositions}) {
 
     const canvasRef = useRef(null);
-    const barHeight = 50;
-    const width = 1200;
+    const barHeight = width / 16;
+    // const width = 800;
+
+    const dotSize = Math.floor(width / 36);
+    const border = 3;
 
     const [isDragging, setIsDragging] = useState(false);
     const [dots, setDots] = useState([]);
@@ -57,12 +60,12 @@ function GradientBar({hsvValues, setPositions}) {
 
                 ctx.fillStyle = "black";
                 ctx.beginPath();
-                ctx.arc(dotX, barHeight, 33, 0, Math.PI * 2);
+                ctx.arc(dotX, barHeight, dotSize + border, 0, Math.PI * 2);
                 ctx.fill();
 
                 ctx.fillStyle = hsvObjectToRgbString(hsvValues[i]);
                 ctx.beginPath();
-                ctx.arc(dotX, barHeight, 30, 0, Math.PI * 2);
+                ctx.arc(dotX, barHeight, dotSize, 0, Math.PI * 2);
                 ctx.fill();
             }
 
@@ -200,8 +203,8 @@ function GradientBar({hsvValues, setPositions}) {
 
             <canvas 
                 ref={canvasRef} 
-                height="100px" 
-                width="1200px"
+                height={barHeight * 2} 
+                width={width}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}

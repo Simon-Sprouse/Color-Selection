@@ -5,9 +5,11 @@ import ColorWheel from './ColorWheel';
 import GradientBar from './GradientBar';
 import DisplayBar from './DisplayBar';
 
-import { hsvObjectToRgbString } from './colorFunctions';
+
 
 function App() {
+
+    const width = 600;
 
     const defaultHsv = {h: 180, s:100, v:100};
 
@@ -97,9 +99,6 @@ function App() {
     return (
         <div className="App">
         <header className="App-header">
-            {/* <p>Küüb</p> */}
-            
-            <p></p>
             <span>
                 <button onClick={psuedoRandomizeColors}>Randomize Colors</button>
                 <button onClick={() => setStyle(prevStyle => prevStyle == 1 ? 0 : 1)}>{style == 1 ? "Gradient" : "Step"}</button>
@@ -107,25 +106,22 @@ function App() {
                     <input className="rangeBar" type="range" min="1" max="20" value={numPanels} onChange={(e) => setNumPanels(e.target.value)}/>
                 )}
             </span>
-
-            <DisplayBar hsvValues={hsvValues} positions={positions} style={style} numPanels={numPanels}/>
+            <DisplayBar width={width} hsvValues={hsvValues} positions={positions} style={style} numPanels={numPanels}/>
             <p></p>
-            <GradientBar hsvValues={hsvValues} setPositions={setPositions}/>
-            <p></p>
+            <GradientBar width={width} hsvValues={hsvValues} setPositions={setPositions}/>
             {hsvValues.map((hsv, index) => (
                 <ColorWheel 
+                    width={width}
                     key={index} 
                     hsv={hsv}
                     counter={counter}
                     updateHsv={newHsv => updateHsvValue(index, newHsv)}/>
             ))}
-            <p></p>
             <span>
                 <button onClick={addColorWheel}>Add Color</button>
                 <button onClick={removeColorWheel}>Remove Color</button>
             </span>
-            
-            <p></p>
+
             {/* <pre style={{textAlign: "left"}}>
                 {"background: linear-gradient(90deg,\n"}
                 {positions.map((pos, index) => (
